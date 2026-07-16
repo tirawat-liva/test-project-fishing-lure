@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การเคลื่อนไหวของเหยื่อปลอมตกปลา 4 ชนิด</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", "Leelawadee UI", "Sarabun", "Noto Sans Thai", sans-serif;
+    background: linear-gradient(180deg, #04121f 0%, #071e33 100%);
+    color: #eaf4fb;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 36px 16px 20px;
+  }
+  header h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2.3rem);
+    letter-spacing: 0.5px;
+  }
+  header p {
+    margin-top: 10px;
+    color: #9dc3dd;
+    font-size: 0.98rem;
+  }
+  header .hint {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #6f96b3;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr));
+    gap: 22px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 10px 20px 50px;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card canvas {
+    width: 100%;
+    height: 280px;
+    display: block;
+    cursor: pointer;
+  }
+
+  .card .info {
+    padding: 16px 18px 20px;
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+  }
+  .badge.surface { background: #1d5d8c; color: #bfe6ff; }
+  .badge.mid     { background: #1d8c6e; color: #c2ffe9; }
+  .badge.deep    { background: #6e4a9e; color: #e4d3ff; }
+
+  .card p.desc {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #b9d4e6;
+  }
+  .card p.action {
+    margin-top: 8px;
+    font-size: 0.84rem;
+    color: #7fb2d2;
+  }
+  .card p.action b { color: #ffd75e; font-weight: 600; }
+
+  footer {
+    text-align: center;
+    padding: 0 16px 34px;
+    color: #5d84a1;
+    font-size: 0.82rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎣 การเคลื่อนไหวของเหยื่อปลอมตกปลา</h1>
+  <p>จำลองแอ็กชันใต้น้ำของเหยื่อปลอม 4 ชนิดยอดนิยม — Plug, Popping, Speed Jigging และ Slow Jigging</p>
+  <p class="hint">คลิกที่ภาพเพื่อหยุด / เล่นแอนิเมชัน</p>
+</header>
+
+<main class="grid">
+
+  <section class="card">
+    <canvas id="cv-plug"></canvas>
+    <div class="info">
+      <h2>Plug (ปลั๊ก) <span class="badge mid">ผิวน้ำ–กลางน้ำ</span></h2>
+      <p class="desc">
+        เหยื่อทรงลำตัวปลา มีลิ้น (lip) ที่หัวช่วยให้ดำลงน้ำและเกิดอาการ
+        <b>ส่ายตัวซ้าย–ขวา (wobbling)</b> เมื่อกรอสายเข้ามาอย่างต่อเนื่อง
+        เลียนแบบปลาเล็กที่กำลังว่ายน้ำหนีอย่างเป็นธรรมชาติ
+      </p>
+      <p class="action">จังหวะการใช้: <b>กรอสายสม่ำเสมอ</b> สลับหยุดเป็นช่วง ๆ เพื่อกระตุ้นให้ปลาเข้าชาร์จ</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <canvas id="cv-pop"></canvas>
+    <div class="info">
+      <h2>Popping (ป๊อปปิ้ง) <span class="badge surface">ผิวน้ำ</span></h2>
+      <p class="desc">
+        เหยื่อผิวน้ำที่มี <b>ปากถ้วยเว้า</b> อยู่ด้านหน้า เมื่อกระตุกสายเป็นจังหวะ
+        ปากถ้วยจะตีผิวน้ำให้เกิดเสียง "ป๊อก" พร้อมละอองน้ำกระเซ็น
+        เลียนแบบปลาเล็กแตกตื่นบนผิวน้ำ
+      </p>
+      <p class="action">จังหวะการใช้: <b>กระตุก–หยุด–กระตุก</b> ให้เกิดเสียงและฟองน้ำเรียกปลาขึ้นมาชาร์จ</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <canvas id="cv-speed"></canvas>
+    <div class="info">
+      <h2>Speed Jigging <span class="badge deep">น้ำลึก</span></h2>
+      <p class="desc">
+        ใช้จิ๊กโลหะทรงเรียวน้ำหนักมาก ทิ้งลงจนถึงหน้าดินแล้ว
+        <b>กระชากคันพร้อมกรอสายเร็วต่อเนื่อง</b> จิ๊กจะพุ่งขึ้นแบบซิกแซ็กอย่างรวดเร็ว
+        เลียนแบบปลาเหยื่อที่ตกใจหนีขึ้นสู่ผิวน้ำ
+      </p>
+      <p class="action">จังหวะการใช้: <b>กระชากเร็ว ถี่ และแรง</b> จากหน้าดินขึ้นสู่กลางน้ำ แล้วปล่อยลงใหม่</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <canvas id="cv-slow"></canvas>
+    <div class="info">
+      <h2>Slow Jigging <span class="badge deep">หน้าดิน–น้ำลึก</span></h2>
+      <p class="desc">
+        ใช้จิ๊กทรงแบนกว้าง ยกคันช้า ๆ เป็นจังหวะแล้ว <b>ปล่อยให้จิ๊กพลิ้วร่วง
+        แฉลบไปมาเหมือนใบไม้ (fluttering fall)</b> จังหวะที่จิ๊กร่วงคือจังหวะที่ปลาเข้ากัด
+        เลียนแบบปลาเหยื่อบาดเจ็บใกล้ตาย
+      </p>
+      <p class="action">จังหวะการใช้: <b>ยกช้า–ปล่อยร่วง</b> เน้นจังหวะตกของจิ๊กมากกว่าความเร็ว</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>จำลองการเคลื่อนไหวด้วย Canvas Animation — ความเร็วและระยะถูกปรับเพื่อการแสดงผล ไม่ใช่สัดส่วนจริง</footer>
+
+<script>
+(function () {
+  "use strict";
+  const TAU = Math.PI * 2;
+  const panels = [];
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const easeOut = (x) => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+  const easeIn = (x) => Math.pow(clamp(x, 0, 1), 2);
+
+  /* ---------- panel setup ---------- */
+
+  function makePanel(canvasId, sim) {
+    const canvas = document.getElementById(canvasId);
+    const panel = { canvas, sim, t: 0, paused: false, particles: [], mem: {}, view: null };
+    panel.resize = function () {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      panel.view = { ctx, W: rect.width, H: rect.height };
+    };
+    canvas.addEventListener("click", () => { panel.paused = !panel.paused; });
+    panel.resize();
+    panels.push(panel);
+  }
+
+  /* ---------- particles ---------- */
+
+  function spawn(panel, props) {
+    panel.particles.push(Object.assign(
+      { x: 0, y: 0, vx: 0, vy: 0, life: 1, maxLife: 1, r: 2, type: "bubble", gravity: 0 },
+      props
+    ));
+  }
+
+  function updateParticles(panel, dt) {
+    const { ctx } = panel.view;
+    const list = panel.particles;
+    for (let i = list.length - 1; i >= 0; i--) {
+      const p = list[i];
+      if (!panel.paused) {
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += p.gravity * dt;
+      }
+      if (p.life <= 0) { list.splice(i, 1); continue; }
+      const a = clamp(p.life / p.maxLife, 0, 1);
+      if (p.type === "bubble") {
+        ctx.strokeStyle = "rgba(255,255,255," + (0.55 * a).toFixed(3) + ")";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, TAU);
+        ctx.stroke();
+      } else if (p.type === "splash") {
+        ctx.fillStyle = "rgba(235,250,255," + (0.9 * a).toFixed(3) + ")";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * a, 0, TAU);
+        ctx.fill();
+      } else if (p.type === "glint") {
+        ctx.fillStyle = "rgba(255,255,210," + (0.85 * a).toFixed(3) + ")";
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(a * 2);
+        ctx.fillRect(-p.r, -0.8, p.r * 2, 1.6);
+        ctx.fillRect(-0.8, -p.r, 1.6, p.r * 2);
+        ctx.restore();
+      }
+    }
+  }
+
+  /* ---------- shared scenery ---------- */
+
+  function drawWater(ctx, W, H, opts) {
+    const surf = opts.surf;
+    const t = opts.t;
+    // sky
+    const sky = ctx.createLinearGradient(0, 0, 0, surf);
+    sky.addColorStop(0, "#b9e0fb");
+    sky.addColorStop(1, "#83c3ef");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, surf);
+    // water
+    const g = ctx.createLinearGradient(0, surf, 0, H);
+    g.addColorStop(0, opts.deep ? "#155a8a" : "#2e86c1");
+    g.addColorStop(1, opts.deep ? "#04182b" : "#0b3455");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, surf, W, H - surf);
+    // surface waves
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 5) {
+      const y = surf + Math.sin(x * 0.045 + t * 2.1) * 2 + Math.sin(x * 0.11 - t * 1.4) * 1.2;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    // light rays
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = "#ffffff";
+    for (let i = 0; i < 3; i++) {
+      const rx = W * (0.2 + i * 0.3) + Math.sin(t * 0.4 + i) * 12;
+      ctx.beginPath();
+      ctx.moveTo(rx - 8, surf);
+      ctx.lineTo(rx + 8, surf);
+      ctx.lineTo(rx + 42, H);
+      ctx.lineTo(rx - 42, H);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+    // seabed
+    if (opts.bottom) {
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      ctx.lineTo(0, H - 16);
+      ctx.quadraticCurveTo(W * 0.25, H - 26, W * 0.5, H - 17);
+      ctx.quadraticCurveTo(W * 0.75, H - 10, W, H - 20);
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      ctx.fillStyle = "#3d3020";
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc((i * 97 + 40) % W, H - 8 - (i % 3) * 4, 2.2, 0, TAU);
+        ctx.fill();
+      }
+    }
+  }
+
+  function drawFishingLine(ctx, x0, y0, x1, y1, sag) {
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 + (sag || 0), x1, y1);
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  function drawPausedOverlay(ctx, W, H) {
+    ctx.fillStyle = "rgba(4,15,26,0.45)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 10, H / 2 - 16);
+    ctx.lineTo(W / 2 + 16, H / 2);
+    ctx.lineTo(W / 2 - 10, H / 2 + 16);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  /* ---------- lure shapes ---------- */
+
+  function drawTreble(ctx, x, y) {
+    ctx.strokeStyle = "#c9d6de";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + 5);
+    ctx.moveTo(x, y + 5);
+    ctx.arc(x - 2.5, y + 5, 2.5, 0, Math.PI * 0.9);
+    ctx.moveTo(x, y + 5);
+    ctx.arc(x + 2.5, y + 5, 2.5, Math.PI, Math.PI * 1.9, false);
+    ctx.stroke();
+  }
+
+  // nose (line-tie) at local (-24, 0), tail at (+30, 0)
+  function drawPlugLure(ctx, x, y, ang) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    const g = ctx.createLinearGradient(0, -9, 0, 9);
+    g.addColorStop(0, "#ffd75e");
+    g.addColorStop(0.55, "#ff9432");
+    g.addColorStop(1, "#b5511a");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 22, 8, 0, 0, TAU);
+    ctx.fill();
+    // tail fin
+    ctx.beginPath();
+    ctx.moveTo(19, 0);
+    ctx.lineTo(30, -6);
+    ctx.lineTo(30, 6);
+    ctx.closePath();
+    ctx.fill();
+    // diving lip
+    ctx.fillStyle = "rgba(205,235,255,0.85)";
+    ctx.beginPath();
+    ctx.moveTo(-20, 1);
+    ctx.quadraticCurveTo(-33, 6, -29, 14);
+    ctx.lineTo(-17, 6);
+    ctx.closePath();
+    ctx.fill();
+    // eye
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(-13, -2.5, 3, 0, TAU); ctx.fill();
+    ctx.fillStyle = "#101820";
+    ctx.beginPath(); ctx.arc(-13, -2.5, 1.5, 0, TAU); ctx.fill();
+    drawTreble(ctx, -2, 7);
+    drawTreble(ctx, 16, 5);
+    ctx.restore();
+  }
+
+  // cupped face (line-tie) at local (-20, 0)
+  function drawPopper(ctx, x, y, ang) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    const g = ctx.createLinearGradient(0, -8, 0, 8);
+    g.addColorStop(0, "#f8fbff");
+    g.addColorStop(0.6, "#dbe7ee");
+    g.addColorStop(1, "#9fb4c0");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(-18, -8);
+    ctx.quadraticCurveTo(14, -11, 22, -3);
+    ctx.quadraticCurveTo(26, 0, 22, 3);
+    ctx.quadraticCurveTo(14, 11, -18, 8);
+    ctx.closePath();
+    ctx.fill();
+    // red head
+    ctx.fillStyle = "#e2493b";
+    ctx.beginPath();
+    ctx.moveTo(-18, -8);
+    ctx.quadraticCurveTo(-8, -9.5, -4, -8.6);
+    ctx.lineTo(-4, 8.6);
+    ctx.quadraticCurveTo(-8, 9.5, -18, 8);
+    ctx.closePath();
+    ctx.fill();
+    // concave cup
+    ctx.fillStyle = "#8c1f16";
+    ctx.beginPath();
+    ctx.ellipse(-18, 0, 3.4, 8, 0, 0, TAU);
+    ctx.fill();
+    // eye
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(-8, -3, 3, 0, TAU); ctx.fill();
+    ctx.fillStyle = "#101820";
+    ctx.beginPath(); ctx.arc(-8, -3, 1.5, 0, TAU); ctx.fill();
+    drawTreble(ctx, 2, 8);
+    drawTreble(ctx, 18, 4);
+    ctx.restore();
+  }
+
+  // metal jig drawn along local x-axis, head (line-tie) at (-len/2, 0)
+  function drawJig(ctx, x, y, ang, len, wid, c1, c2) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    const g = ctx.createLinearGradient(0, -wid, 0, wid);
+    g.addColorStop(0, c1);
+    g.addColorStop(0.5, "#f4fbff");
+    g.addColorStop(1, c2);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(-len / 2, 0);
+    ctx.quadraticCurveTo(-len / 4, -wid, len / 5, -wid * 0.8);
+    ctx.quadraticCurveTo(len / 2, -wid * 0.25, len / 2, 0);
+    ctx.quadraticCurveTo(len / 2, wid * 0.25, len / 5, wid * 0.8);
+    ctx.quadraticCurveTo(-len / 4, wid, -len / 2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(20,40,60,0.35)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // assist hook at head
+    ctx.strokeStyle = "#c9d6de";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-len / 2, 0);
+    ctx.lineTo(-len / 2 - 6, 3);
+    ctx.arc(-len / 2 - 8, 4.5, 2.6, -0.5, Math.PI * 0.9);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- simulations ---------- */
+
+  // 1) Plug — steady retrieve, tight side-to-side wobble under the surface
+  function simPlug(panel) {
+    const { ctx, W, H } = panel.view;
+    const t = panel.t;
+    const surf = 42;
+    drawWater(ctx, W, H, { surf, t });
+
+    const span = W + 150;
+    const x = W + 70 - ((t * 75 + 180) % span);
+    const y = surf + 58 + Math.sin(t * 2.1) * 7;
+    const ang = Math.sin(t * 13) * 0.22 - 0.05;
+
+    // rod is to the left (retrieve direction) — line to the nose
+    const nx = x + Math.cos(ang) * -24;
+    const ny = y + Math.sin(ang) * -24;
+    drawFishingLine(ctx, 8, 6, nx, ny, 14);
+    drawPlugLure(ctx, x, y, ang);
+
+    if (!panel.paused && Math.random() < 0.35) {
+      spawn(panel, {
+        x: x + 26, y: y + (Math.random() * 10 - 5),
+        vx: 12, vy: -18 - Math.random() * 10,
+        r: 1 + Math.random() * 1.6, life: 1.1, maxLife: 1.1, type: "bubble"
+      });
+    }
+  }
+
+  // 2) Popping — rhythmic jerks on the surface with pops and splashes
+  function simPop(panel) {
+    const { ctx, W, H } = panel.view;
+    const t = panel.t;
+    const surf = 74;
+    drawWater(ctx, W, H, { surf, t });
+
+    const P = 1.5;          // seconds per pop cycle
+    const dist = 42;        // travel per pop
+    const steps = Math.max(3, Math.floor((W - 110) / dist));
+    const n = Math.floor(t / P);
+    const frac = (t % P) / P;
+    const step = n % steps;
+    const jerk = frac < 0.16 ? easeOut(frac / 0.16) : 1;
+
+    const x = W - 55 - (step * dist + jerk * dist);
+    const y = surf - 1 + (frac < 0.16 ? Math.sin((frac / 0.16) * Math.PI) * 2.5 : 0);
+    const ang = frac < 0.22 ? 0.32 * Math.sin((frac / 0.22) * Math.PI) : 0;
+
+    const nx = x + Math.cos(ang) * -20;
+    const ny = y + Math.sin(ang) * -20;
+    drawFishingLine(ctx, 8, 8, nx, ny - 2, 10);
+    drawPopper(ctx, x, y, ang);
+
+    // splash burst on each new pop
+    if (!panel.paused && panel.mem.lastPop !== n) {
+      panel.mem.lastPop = n;
+      for (let i = 0; i < 16; i++) {
+        spawn(panel, {
+          x: x - 14, y: surf - 2,
+          vx: -20 - Math.random() * 70, vy: -50 - Math.random() * 80,
+          gravity: 220,
+          r: 1.6 + Math.random() * 2.4, life: 0.7 + Math.random() * 0.4,
+          maxLife: 1.1, type: "splash"
+        });
+      }
+      panel.mem.ring = { x: x - 16, y: surf, t: 0 };
+    }
+    // expanding pop ring + "ป๊อก!"
+    const ring = panel.mem.ring;
+    if (ring) {
+      if (!panel.paused) ring.t += panel.dt;
+      const rp = ring.t / 0.6;
+      if (rp < 1) {
+        ctx.strokeStyle = "rgba(255,255,255," + (0.6 * (1 - rp)).toFixed(3) + ")";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(ring.x, ring.y, 6 + rp * 26, 2 + rp * 6, 0, 0, TAU);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,235,160," + (0.9 * (1 - rp)).toFixed(3) + ")";
+        ctx.font = "bold 13px sans-serif";
+        ctx.fillText("ป๊อก!", ring.x - 14, ring.y - 26 - rp * 8);
+      } else {
+        panel.mem.ring = null;
+      }
+    }
+  }
+
+  // 3) Speed Jigging — fast erratic pumps from the bottom, then free-fall back
+  function simSpeed(panel) {
+    const { ctx, W, H } = panel.view;
+    const t = panel.t;
+    const surf = 26;
+    drawWater(ctx, W, H, { surf, t, deep: true, bottom: true });
+
+    const cx = W * 0.55;
+    const top = surf + 42;
+    const bottom = H - 42;
+    const P = 4.2;               // rise 2.5s + fall 1.2s + rest 0.5s
+    const u = t % P;
+
+    let x, y, ang;
+    if (u < 2.5) {               // rapid pumping rise
+      const p = u / 2.5;
+      const pump = t * 15;
+      y = bottom - p * (bottom - top) - Math.abs(Math.sin(pump)) * 14;
+      x = cx + Math.sin(pump * 0.5) * 16;
+      ang = -Math.PI / 2 + Math.sin(pump) * 0.3;
+      if (!panel.paused && Math.random() < 0.5) {
+        spawn(panel, {
+          x: x + (Math.random() * 12 - 6), y: y + 10,
+          vx: 0, vy: -30 - Math.random() * 20,
+          r: 1 + Math.random() * 1.5, life: 0.9, maxLife: 0.9, type: "bubble"
+        });
+      }
+    } else if (u < 3.7) {        // free fall
+      const d = (u - 2.5) / 1.2;
+      y = top + easeIn(d) * (bottom - top);
+      x = cx + Math.sin(t * 6) * 8;
+      ang = Math.sin(t * 9) * 0.4;
+    } else {                     // resting at the bottom
+      y = bottom;
+      x = cx;
+      ang = Math.sin(t * 2) * 0.1;
+    }
+
+    const hx = x + Math.cos(ang) * -27;
+    const hy = y + Math.sin(ang) * -27;
+    drawFishingLine(ctx, cx, 4, hx, hy, u >= 2.5 && u < 3.7 ? 26 : 4);
+    drawJig(ctx, x, y, ang, 54, 8, "#8fd0ff", "#3f6f9e");
+  }
+
+  // 4) Slow Jigging — slow lift, then a wide fluttering leaf-like fall
+  function simSlow(panel) {
+    const { ctx, W, H } = panel.view;
+    const t = panel.t;
+    const surf = 26;
+    drawWater(ctx, W, H, { surf, t, deep: true, bottom: true });
+
+    const cx = W * 0.5;
+    const hi = H * 0.38;
+    const lo = H - 46;
+    const P = 3.6;               // lift 1.1s + flutter fall 2.5s
+    const u = t % P;
+
+    let x, y, ang;
+    if (u < 1.1) {               // slow deliberate lift
+      const p = easeOut(u / 1.1);
+      y = lo - p * (lo - hi);
+      x = cx + Math.sin(t * 1.5) * 4;
+      ang = -1.15 + Math.sin(t * 3) * 0.08;
+    } else {                     // fluttering fall — the bite window
+      const d = (u - 1.1) / 2.5;
+      y = hi + d * (lo - hi);
+      x = cx + Math.sin(d * Math.PI * 2.5) * 30;
+      ang = Math.sin(t * 5.2) * 0.55 + Math.cos(d * Math.PI * 2.5) * 0.25;
+      if (!panel.paused && Math.random() < 0.18) {
+        spawn(panel, {
+          x, y, vx: 0, vy: 0,
+          r: 4 + Math.random() * 3, life: 0.5, maxLife: 0.5, type: "glint"
+        });
+      }
+    }
+
+    const hx = x + Math.cos(ang) * -22;
+    const hy = y + Math.sin(ang) * -22;
+    drawFishingLine(ctx, cx, 4, hx, hy, u < 1.1 ? 4 : 30);
+    drawJig(ctx, x, y, ang, 44, 13, "#ffb3c8", "#b05f7a");
+  }
+
+  /* ---------- main loop ---------- */
+
+  makePanel("cv-plug", simPlug);
+  makePanel("cv-pop", simPop);
+  makePanel("cv-speed", simSpeed);
+  makePanel("cv-slow", simSlow);
+
+  window.addEventListener("resize", () => panels.forEach((p) => p.resize()));
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    for (const panel of panels) {
+      panel.dt = dt;
+      if (!panel.paused) panel.t += dt;
+      const { ctx, W, H } = panel.view;
+      ctx.clearRect(0, 0, W, H);
+      panel.sim(panel);
+      updateParticles(panel, dt);
+      if (panel.paused) drawPausedOverlay(ctx, W, H);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
